@@ -6,6 +6,9 @@ using CefSharp.DevTools.IO;
 using CefSharp.MinimalExample.WinForms.Controls;
 using CefSharp.WinForms;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Dynamic;
 using System.Net;
 using System.Windows.Forms;
 
@@ -38,6 +41,7 @@ namespace CefSharp.MinimalExample.WinForms
             browser.TitleChanged += OnBrowserTitleChanged;
             browser.AddressChanged += OnBrowserAddressChanged;
             browser.LoadError += OnBrowserLoadError;
+            browser.JavascriptMessageReceived += OnBrowserJavascriptMessageReceived;
 
             var version = string.Format("Chromium: {0}, CEF: {1}, CefSharp: {2}",
                Cef.ChromiumVersion, Cef.CefVersion, Cef.CefSharpVersion);
@@ -54,6 +58,17 @@ namespace CefSharp.MinimalExample.WinForms
 #endif
 
             DisplayOutput(string.Format("{0}, {1}", version, environment));
+        }
+
+
+        private void OnBrowserJavascriptMessageReceived(object sender, JavascriptMessageReceivedEventArgs e)
+        {
+            var msg = e.Message;
+            Console.WriteLine(msg);
+
+            
+
+            Console.WriteLine("URL: ${0}", ((ChromiumWebBrowser)sender).Address);
         }
 
         private void OnBrowserLoadError(object sender, LoadErrorEventArgs e)
@@ -77,7 +92,7 @@ namespace CefSharp.MinimalExample.WinForms
         private void OnIsBrowserInitializedChanged(object sender, EventArgs e)
         {
             var b = ((ChromiumWebBrowser)sender);
-
+            b.ShowDevTools();
             this.InvokeOnUiThreadIfRequired(() => b.Focus());
         }
 
